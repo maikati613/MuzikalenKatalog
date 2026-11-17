@@ -2,28 +2,26 @@
 {% load static %}
 
 {% block content %}
-<section class="hero">
-    <h1>Твоята музика започва тук</h1>
-    <p>Разгледай албуми от любимите си изпълнители и намери нещо ново за слушане.</p>
+<section class="searchbar">
     <form class="search" method="get" action="/">
-        <input type="text" name="q" value="{{ q }}" placeholder="Търси албум по заглавие…" autocomplete="off">
-        <button type="submit">Търсене</button>
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by album or artist…" autocomplete="off">
+        <button type="submit">Search</button>
     </form>
 </section>
 
 <main>
     <div class="section-head">
         {% if q %}
-            <h2>Резултати за „{{ q }}“</h2>
-            <a class="clear" href="/">Покажи всички албуми</a>
+            <h2>Results for “{{ q }}”</h2>
+            <a class="clear" href="/">Show all albums</a>
         {% else %}
-            <h2>Всички албуми</h2>
+            <h2>All albums</h2>
         {% endif %}
-        <span class="count">{{ albums|length }} {% if albums|length == 1 %}албум{% else %}албума{% endif %}</span>
+        <span class="count">{{ albums|length }} {% if albums|length == 1 %}album{% else %}albums{% endif %}</span>
     </div>
 
     <div class="browse">
-        <nav class="letters" aria-label="Азбучен указател">
+        <nav class="letters" aria-label="Alphabetical index">
             {% for l in letters %}
                 {% if l.has %}
                     <a href="#letter-{{ l.char }}">{{ l.char }}</a>
@@ -33,50 +31,53 @@
             {% endfor %}
         </nav>
 
-        {% if albums %}
-            <div class="grid">
-                {% for album in albums %}
-                    <article class="card"{% if album.first_of_letter %} id="letter-{{ album.letter }}"{% endif %}>
-                        <div class="cover" style="--h: {{ album.hue }}">
-                            <span class="year">{{ album.year }}</span>
-                            <span class="initial">{{ album.title|first }}</span>
-                        </div>
-                        <div class="card-body">
-                            <p class="artist">{{ album.artist }}</p>
-                            <h3>{{ album.title }}</h3>
-                            <p class="desc">{{ album.description }}</p>
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty">Не са намерени албуми със заглавие „{{ q }}“.</div>
-        {% endif %}
-    </div>
-</main>
-
-<section class="artists-strip">
-    <h2>Изпълнители</h2>
-    <div class="marquee">
-        <div class="marquee-track">
-            {% for pass in "ab" %}
-                <div class="marquee-group"{% if pass == "b" %} aria-hidden="true"{% endif %}>
-                    {% for artist in artists %}
-                        <div class="artist-card">
-                            <div class="avatar" style="--h: {{ artist.hue }}">
-                                <span>{{ artist.initials }}</span>
-                                <img src="{% static 'artists/'|add:artist.slug|add:'.jpg' %}" alt="" onerror="this.remove()">
+        <div class="content">
+            {% for block in blocks %}
+                <div class="grid">
+                    {% for album in block.albums %}
+                        <article class="card"{% if album.first_of_letter %} id="letter-{{ album.letter }}"{% endif %}>
+                            <div class="cover" style="--h: {{ album.hue }}">
+                                <span class="year">{{ album.year }}</span>
+                                <span class="initial">{{ album.title|first }}</span>
+                                <img src="{% static 'covers/'|add:album.slug|add:'.jpg' %}" alt="" loading="lazy" onerror="this.remove()">
                             </div>
-                            <div class="artist-info">
-                                <strong>{{ artist.name }}</strong>
-                                <span class="genre">{{ artist.genre }}</span>
-                                <span class="song">♪ {{ artist.song }}</span>
+                            <div class="card-body">
+                                <p class="artist">{{ album.artist }}</p>
+                                <h3>{{ album.title }}</h3>
+                                <p class="desc">{{ album.description }}</p>
                             </div>
-                        </div>
+                        </article>
                     {% endfor %}
                 </div>
+
+                {% if block.artists %}
+                    <section class="artists-strip">
+                        <h2>Featured artists</h2>
+                        <div class="marquee">
+                            <div class="marquee-track">
+                                {% for half in "ab" %}
+                                    <div class="marquee-group"{% if half == "b" %} aria-hidden="true"{% endif %}>
+                                        {% for artist in block.artists %}
+                                            <div class="artist-card" style="--h: {{ artist.hue }}">
+                                                <span class="initials">{{ artist.initials }}</span>
+                                                <img src="{% static 'artists/'|add:artist.slug|add:'.jpg' %}" alt="" onerror="this.remove()">
+                                                <div class="info">
+                                                    <strong>{{ artist.name }}</strong>
+                                                    <span class="genre">{{ artist.genre }}</span>
+                                                    <span class="song">{{ artist.song }}</span>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </section>
+                {% endif %}
+            {% empty %}
+                <div class="empty">No albums found for “{{ q }}”.</div>
             {% endfor %}
         </div>
     </div>
-</section>
+</main>
 {% endblock %}

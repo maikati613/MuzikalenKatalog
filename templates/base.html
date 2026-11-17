@@ -1,23 +1,23 @@
 {% load static %}<!DOCTYPE html>
-<html lang="bg">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Музикален каталог{% endblock %}</title>
+    <title>{% block title %}Music Catalog{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-    <div class="announce">Открий албумите, които обичаш</div>
+    <div class="announce">Discover the albums you love</div>
 
     <header class="site-header">
         <div class="inner">
-            <a class="logo" href="/">Музикален<span>.</span>каталог</a>
-            <nav><a href="/">Начало</a></nav>
+            <a class="logo" href="/">Music<span>.</span>catalog</a>
+            <nav><a href="/">Home</a></nav>
         </div>
     </header>
 
     {% block content %}{% endblock %}
 
-    <footer>© 2026 Музикален каталог</footer>
+    <footer>© 2026 Music Catalog</footer>
 </body>
 </html>
