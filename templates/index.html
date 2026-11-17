@@ -1,23 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Music Catalog</title>
-    <style>
-        body { font-family: system-ui, sans-serif; margin: 0; background: #f5f5f7; color: #222; }
-        header { background: #222; color: #fff; padding: 1rem 2rem; }
-        header h1 { margin: 0; font-size: 1.4rem; }
-        main { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>Music Catalog</h1>
-    </header>
-    <main>
-        <h2>Welcome</h2>
-        <p>This is the main page of the Music Catalog.</p>
-    </main>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="hero">
+    <h1>Твоята музика започва тук</h1>
+    <p>Разгледай албуми от любимите си изпълнители и намери нещо ново за слушане.</p>
+    <form class="search" method="get" action="/">
+        <input type="text" name="q" value="{{ q }}" placeholder="Търси албум по заглавие…" autocomplete="off">
+        <button type="submit">Търсене</button>
+    </form>
+</section>
+
+<main>
+    <div class="section-head">
+        {% if q %}
+            <h2>Резултати за „{{ q }}“</h2>
+            <a class="clear" href="/">Покажи всички албуми</a>
+        {% else %}
+            <h2>Всички албуми</h2>
+        {% endif %}
+        <span class="count">{{ albums|length }} {% if albums|length == 1 %}албум{% else %}албума{% endif %}</span>
+    </div>
+
+    <div class="browse">
+        <nav class="letters" aria-label="Азбучен указател">
+            {% for l in letters %}
+                {% if l.has %}
+                    <a href="#letter-{{ l.char }}">{{ l.char }}</a>
+                {% else %}
+                    <span class="off">{{ l.char }}</span>
+                {% endif %}
+            {% endfor %}
+        </nav>
+
+        {% if albums %}
+            <div class="grid">
+                {% for album in albums %}
+                    <article class="card"{% if album.first_of_letter %} id="letter-{{ album.letter }}"{% endif %}>
+                        <div class="cover" style="--h: {{ album.hue }}">
+                            <span class="year">{{ album.year }}</span>
+                            <span class="initial">{{ album.title|first }}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="artist">{{ album.artist }}</p>
+                            <h3>{{ album.title }}</h3>
+                            <p class="desc">{{ album.description }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty">Не са намерени албуми със заглавие „{{ q }}“.</div>
+        {% endif %}
+    </div>
+</main>
+
+<section class="artists-strip">
+    <h2>Изпълнители</h2>
+    <div class="marquee">
+        <div class="marquee-track">
+            {% for pass in "ab" %}
+                <div class="marquee-group"{% if pass == "b" %} aria-hidden="true"{% endif %}>
+                    {% for artist in artists %}
+                        <div class="artist-card">
+                            <div class="avatar" style="--h: {{ artist.hue }}">
+                                <span>{{ artist.initials }}</span>
+                                <img src="{% static 'artists/'|add:artist.slug|add:'.jpg' %}" alt="" onerror="this.remove()">
+                            </div>
+                            <div class="artist-info">
+                                <strong>{{ artist.name }}</strong>
+                                <span class="genre">{{ artist.genre }}</span>
+                                <span class="song">♪ {{ artist.song }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
